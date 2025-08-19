@@ -1,0 +1,309 @@
+% 单文件处理算法
+clear;
+clc;
+close all;
+
+% 本程序需要时刻注意的地方：参数定义区域，读取文件类型区域，手动选取标签区域
+
+%% Define the constants used
+output_path = 'F:\硕士文件\gprMAX相关\实测数据\SIFT_extract\Multidirectional Enhancement Model Based on SIFT for GPR Underground Pipeline Recognition_latex\描述符\'; % 输出描述符路径
+PCA_path = 'D:\硕士文件\gprMAX相关\实测数据\SIFT_extract\SIFT_extract_in_GPR\descriptors\target_real\PCA_model.csv'; % 在构建PCA-SIFT描述符时，PCA模型路径
+begin = 1;% 文件开始读取点
+en = 1;% 文件结束读取点
+sigma=1.6;%最底层高斯金字塔的尺度
+dog_center_layer=5;%定义了DOG金字塔每组中间层数，默认是5
+contrast_threshold_1=0.03;%Contrast threshold 原版给的是0.03
+edge_threshold=10;%Edge threshold
+is_double_size=false;%expand image or not
+des_type ='FE-GLOH-like';%Type of descriptor,it can be 'GLOH-like','SIFT','PCA-SIFT','RootSIFT','FE-GLOH-like'
+LOG_POLAR_DESCR_WIDTH=8;
+LOG_POLAR_HIST_BINS=8;
+SIFT_DESCR_WIDTH=4;   %SIFT特征提取区域，默认4×4区域
+SIFT_HIST_BINS=8;     %SIFT特征方向，默认8方向
+T_angle=3;    % 距离垂直距离的偏移角度阈值，abs()<T_angle认定为垂直
+FS_vector=[1,1,1,1,1,1,1,1]; % 每个角度的特征增强系数，最后一个值是关键点主方向增强系数
+edge_detect = "on"; % 是否去除边缘效应，on表示去除边缘效应
+angleverse = "on"; % 是否暴力翻转主方向角度
+contrast = [10,0.05]; % 当关键点数量大于第一个数时，开启去除低幅度点模式，阈值为第二个数
+T_symmetry = 1.2;
+n_max = 100; % 如果加入相位抖动，最大抖动大小
+n_sigma2 = 1; % 高斯抖动大小
+phase_noise = "off"; %是否加相位抖动，“on”加噪，“off”不加噪
+interpola = "off"; %是否进行缩放，"on"是，"off"否
+inter_m = [512,160]; %缩放倍数
+mode = "DZT"; % 源文件类型，包含"out","lte","DZT","png"，可自定义其他类型
+
+for outid = begin:en
+    disp(['----------------开始生成第',num2str(outid),'个文件的描述符----------------']);
+    %% 读取文件
+    if strcmp(mode,"out")
+    % out仿真文件
+    [TrackInterval,dt,B_scan_image,outfile_name] = read_outdata();
+    file_parts = split(DZTfile_name,'.');
+    file_label = file_parts{1};
+
+    elseif strcmp(mode,"lte")
+    % 读取lte文件
+    [TrackInterval,dt,B_scan_image,ltefile_name] = readB_scan();
+    file_parts = split(ltefile_name,'.');
+    file_label = file_parts{1};
+
+    elseif strcmp(mode,"DZT")
+    % 读取GSSI公司的DZT文件
+    [TrackInterval,dt,B_scan_image,DZTfile_name] = main_gssi();
+    TrackInterval = TrackInterval*0.01;% 由于返回的是cm，因此乘0.01
+    time = (0:size(B_scan_image,1)-1)*dt;
+    track = (1:size(B_scan_image,2))*TrackInterval; 
+    file_parts = split(DZTfile_name,'.');
+    file_label = file_parts{1};
+    
+    elseif strcmp(mode,"png")
+    % 读取png文件
+    [png_name, png_path] = uigetfile('*.png', 'Select gprMax image to analyse', 'MultiSelect', 'on');
+    file_parts = split(png_name,'.');
+    file_label = file_parts{1};
+    png_full_path = strcat(png_path,'/',png_name);
+    B_scan_png = imread(png_full_path);
+    B_scan_image = im2double(B_scan_png(:,:,1));
+    end
+
+    % 画图
+    figure
+    imagesc(B_scan_image);
+    colormap('gray');
+    xlabel('Trace(m)');ylabel('Time(ns)');
+    set(gca,'linewidth',1,'fontsize',20,'fontname','Times New Roman');
+    origin_B_scan_image = B_scan_image;
+
+    %% 预处理
+    % 低秩稀疏分解去直达波
+    addpath('D:\硕士文件\gprMAX相关\实测数据\RPCA_With_TV');
+    addpath('D:\硕士文件\gprMAX相关\实测数据\RPCA_With_TV\read_data');  
+    addpath('D:\硕士文件\gprMAX相关\实测数据\RPCA_With_TV\prox_operator');  
+    addpath('D:\硕士文件\gprMAX相关\实测数据\RPCA_With_TV\calutate');
+    addpath('D:\硕士文件\gprMAX相关\实测数据\RPCA_With_TV\utils');
+%     lambda = 0.01;beta = 0.03;
+%     n_iters_ADMM=500;n_iters_TV=100;
+%     [X,runtime] = LRS_TV_InALM(B_scan_image,lambda,beta,n_iters_ADMM,n_iters_TV);
+%     B_scan_image_sparse = X.S;
+%     % 均值对消
+%     for i = 1:size(B_scan_image,1)
+%         B_scan_image(i,:) = B_scan_image(i,:)-mean(B_scan_image(i,:));
+%     end
+%     % 画图
+%     figure
+%     imagesc(B_scan_image);
+%     colormap('gray');
+%     xlabel('Trace(m)');ylabel('Time(ns)');
+%     set(gca,'linewidth',1,'fontsize',20,'fontname','Times New Roman');
+
+    % 缩放
+    if interpola == "on"
+        B_scan_image = imresize(B_scan_image,inter_m);
+    end
+
+    % 归一化
+    B_scan_image_normalize = (B_scan_image-min(min(B_scan_image)))/(max(max(B_scan_image))-min(min(B_scan_image)));
+    
+    % 添加相位抖动
+    if phase_noise == "on"
+        [m,n]=size(B_scan_image_normalize);
+        A_scan_length = m-n_max;
+        phase_mean = n_max/2;
+        phase = phase_mean+n_sigma2*randn(1,n);
+        temp_B_scan_image = zeros(A_scan_length,n);
+        for i = 1:n
+            phase_begin = phase(i);
+            if phase_begin>n_max
+                phase_begin = phase_mean;
+            end
+            temp_B_scan_image(:,i) = B_scan_image_normalize(phase_begin+1:phase_begin+A_scan_length,i);
+        end
+        B_scan_image_normalize = temp_B_scan_image;
+    end
+    %% 生成特征描述向量
+    t1=clock;%Start time
+
+    %% The number of groups in Gauss Pyramid
+    nOctaves_1=num_octaves(B_scan_image_normalize,is_double_size);
+
+    %% Pyramid first layer image
+    B_scan_image_normalize=create_initial_image(B_scan_image_normalize,is_double_size,sigma);
+
+    %%  Gauss Pyramid of Reference image
+    tic;
+    [gaussian_pyramid_1,gaussian_gradient_1,gaussian_angle_1]=...
+    build_gaussian_pyramid(B_scan_image_normalize,nOctaves_1,dog_center_layer,sigma);                                                      
+    disp(['参考图像创建Gauss Pyramid花费时间是：',num2str(toc),'s']);
+
+    %% DOG Pyramid of Reference image
+    tic;
+    dog_pyramid_1=build_dog_pyramid(gaussian_pyramid_1,nOctaves_1,dog_center_layer);
+    disp(['参考图像创建DOG Pyramid花费时间是：',num2str(toc),'s']);
+
+    %% display the Gauss Pyramid,DOG Pyramid,gradient of Reference image
+%     display_product_image(gaussian_pyramid_1,dog_pyramid_1,gaussian_gradient_1,...
+%             gaussian_angle_1,nOctaves_1,dog_center_layer,'Reference image');                              
+%      clear gaussian_pyramid_1;
+
+    %% Reference image DOG Pyramid extreme point detection
+    tic;
+    [key_point_array_1]=find_scale_space_extream...
+    (dog_pyramid_1,nOctaves_1,dog_center_layer,contrast_threshold_1,sigma,...
+    edge_threshold,gaussian_gradient_1,gaussian_angle_1,edge_detect);
+    disp(['参考图像关键点定位花费时间是：',num2str(toc),'s']);
+%     clear dog_pyramid_1;
+    
+    %% 选取向上/向下梯度关键点
+    Vernum = 0;
+    temp_key_point_array = struct('x',{},'y',{},'octaves',{},'layer',{},...
+     'xi',{},'size',{},'angle',{},'gradient',{});
+    for i = 1:size(key_point_array_1,2)
+        if abs(key_point_array_1(i).angle-90)<T_angle
+            Vernum = Vernum+1;
+            if angleverse == "on"
+                key_point_array_1(i).angle = key_point_array_1(i).angle+180;
+            end
+            temp_key_point_array(Vernum)=key_point_array_1(i);
+        elseif abs(key_point_array_1(i).angle-270)<T_angle
+            Vernum = Vernum+1;
+            temp_key_point_array(Vernum)=key_point_array_1(i);
+        end
+    end
+    key_point_array_1 = temp_key_point_array;
+    %% 筛选小幅度数据
+    if size(key_point_array_1,2)>contrast(1,1)
+    Vernum = 0;
+    temp_key_point_array = struct('x',{},'y',{},'octaves',{},'layer',{},...
+     'xi',{},'size',{},'angle',{},'gradient',{});
+    me = mean(B_scan_image_normalize(:));
+        for i = 1:size(key_point_array_1,2)
+            x = round(key_point_array_1(i).x);
+            y = round(key_point_array_1(i).y);
+            if abs(B_scan_image_normalize(y,x)-me)>contrast(1,2)
+                Vernum = Vernum+1;
+                temp_key_point_array(Vernum)=key_point_array_1(i);
+            end
+        end
+    end
+    key_point_array_1 = temp_key_point_array; 
+    if isempty(key_point_array_1)
+        continue
+    end
+    %% descriptor generation of the reference image 
+    tic;
+    [descriptors_1,nex_descriptors_1,locs_1]=calc_descriptors(gaussian_gradient_1,gaussian_angle_1,...
+                                    key_point_array_1,nOctaves_1,is_double_size,des_type,...
+                                    LOG_POLAR_DESCR_WIDTH,LOG_POLAR_HIST_BINS,...
+                                    SIFT_DESCR_WIDTH,SIFT_HIST_BINS,FS_vector);
+    disp(['参考图像描述符生成花费时间是：',num2str(toc),'s']); 
+%     clear gaussian_gradient_1;
+%     clear gaussian_angle_1;
+    
+    %% 根据对称性筛选双曲线
+    [now_flag,now_locs_1,now_smy] = screen_point_by_symmery(descriptors_1,locs_1,LOG_POLAR_HIST_BINS,SIFT_HIST_BINS,T_symmetry,des_type);
+    [nex_flag,nex_locs_1,nex_smy] = screen_point_by_symmery(nex_descriptors_1,locs_1,LOG_POLAR_HIST_BINS,SIFT_HIST_BINS,T_symmetry,des_type);
+
+    %% Display the detect points
+    [button1]=showpoint_detected_in_different_layer(B_scan_image_normalize,now_locs_1) ;
+    str1=['.\save_image\','The detection point in now octave','.jpg'];
+    saveas(button1,str1,'jpg');
+    
+    [button1]=showpoint_detected_in_different_layer(B_scan_image_normalize,nex_locs_1);
+    str3=['.\save_image\','The detection point in next octave','.jpg'];
+    saveas(button1,str3,'jpg');
+    
+    [button1]=showpoint_detected_in_different_layer(B_scan_image_normalize,locs_1);
+    str4=['.\save_image\','Reference image detection point','.jpg'];
+    saveas(button1,str4,'jpg');
+    [button2]=disp_points_distribute(locs_1,nOctaves_1,dog_center_layer);
+    %% 针对你的实测数据的手动选取标签，本部分不影响最终识别结果
+    label = zeros(size(locs_1,1),1);
+    for i = 1:size(descriptors_1,1)
+        if locs_1(i,1)>=300
+            label(i,:)=1;
+        end
+    end
+    %% Save the data with csv
+    % 保存对称性判别flag
+    % 设置你想要创建的文件夹名称
+    flagfolderName = strcat(output_path,file_label,'\flag_',des_type);
+    % 检查文件夹是否已经存在
+    if ~exist(flagfolderName, 'dir')
+        % 文件夹不存在，创建文件夹
+        mkdir(flagfolderName);
+        disp(['文件夹 "' flagfolderName '" 已创建.']);
+    else
+        % 文件夹已存在
+        disp(['文件夹 "' flagfolderName '" 已存在.']);
+    end
+    labtit=strcat(flagfolderName,'\now_flag_',num2str(outid),'.csv');% 顺序名称
+    [time] = save_csv(now_flag,labtit);
+    disp(['保存标签花费时间是：',num2str(time),'s']);
+    labtit=strcat(flagfolderName,'\nex_flag_',num2str(outid),'.csv');% 顺序名称
+    [time] = save_csv(nex_flag,labtit);
+    disp(['保存标签花费时间是：',num2str(time),'s']);
+    
+    % 保存label
+    labelfolderName = strcat(output_path,file_label,'\label_',des_type);
+    % 检查文件夹是否已经存在
+    if ~exist(labelfolderName, 'dir')
+        % 文件夹不存在，创建文件夹
+        mkdir(labelfolderName);
+        disp(['文件夹 "' labelfolderName '" 已创建.']);
+    else
+        % 文件夹已存在
+        disp(['文件夹 "' labelfolderName '" 已存在.']);
+    end
+    labtit=strcat(labelfolderName,'\label_',num2str(outid),'.csv');% 顺序名称
+    [time] = save_csv(label,labtit);
+    disp(['保存标签花费时间是：',num2str(time),'s']);
+    
+    % 保存descriptor
+    datafolderName = strcat(output_path,file_label,'\data_',des_type);
+    % 检查文件夹是否已经存在
+    if ~exist(datafolderName, 'dir')
+        % 文件夹不存在，创建文件夹
+        mkdir(datafolderName);
+        disp(['文件夹 "' datafolderName '" 已创建.']);
+    else
+        % 文件夹已存在
+        disp(['文件夹 "' datafolderName '" 已存在.']);
+    end
+    destit=strcat(datafolderName,'\now_descriptor_',num2str(outid),'.csv');% 顺序名称
+    [time] = save_csv(descriptors_1,destit);
+    disp(['保存特征描述符花费时间是：',num2str(time),'s']);
+    desnextit=strcat(datafolderName,'\nex_descriptor_',num2str(outid),'.csv');% 顺序名称
+    [time] = save_csv(nex_descriptors_1,desnextit);
+    disp(['保存特征描述符花费时间是：',num2str(time),'s']);
+    
+    % 保存loc
+    locfolderName = strcat(output_path,file_label,'\loc_',des_type);
+    % 检查文件夹是否已经存在
+    if ~exist(locfolderName, 'dir')
+        % 文件夹不存在，创建文件夹
+        mkdir(locfolderName);
+        disp(['文件夹 "' locfolderName '" 已创建.']);
+    else
+        % 文件夹已存在
+        disp(['文件夹 "' locfolderName '" 已存在.']);
+    end
+    loctit=strcat(locfolderName,'\loc_',num2str(outid),'.csv');% 顺序名称
+    [time] = save_csv(locs_1,loctit);
+    disp(['保存特征描述符花费时间是：',num2str(time),'s']);
+
+    % 保存keypoint
+    keypointfolderName = strcat(output_path,file_label,'\keypoint_',des_type);
+    % 检查文件夹是否已经存在
+    if ~exist(keypointfolderName, 'dir')
+        % 文件夹不存在，创建文件夹
+        mkdir(keypointfolderName);
+        disp(['文件夹 "' keypointfolderName '" 已创建.']);
+    else
+        % 文件夹已存在
+        disp(['文件夹 "' keypointfolderName '" 已存在.']);
+    end
+    keypointtit=strcat(keypointfolderName,'\keypoint_',num2str(outid),'.mat'); % 顺序名称
+    save(keypointtit,'key_point_array_1');
+    disp(['保存特征描述符花费时间是：',num2str(time),'s']);
+end

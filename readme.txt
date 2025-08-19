@@ -1,0 +1,2 @@
+代码运行方式：
+1.运行主函数Generate_Training_descriptor_solo，设置参数，选择源文件路径
