@@ -13,7 +13,7 @@ lte_path = '\input\your\path';% lte文件路径
 png_path = '\input\your\path';
 output_path = '\input\your\path\';% 特征描述符输出路径
 file_mode = "mat"; %两种文件格式：“lte”，“DZT”，“png”
-PCA_path = 'D:\硕士文件\gprMAX相关\实测数据\SIFT_extract\SIFT_extract_in_GPR\descriptors\target_real\PCA_model.csv';
+PCA_path = '\input\your\path\PCA_model.csv';
 file_prefix = 'xmbdata_';% 文件开头
 begin = 1;% 文件开始读取点
 en = 1;% 文件结束读取点
@@ -368,4 +368,5 @@ end
     save(keypointtit,'key_point_array_1');
     disp(['保存特征描述符花费时间是：',num2str(time),'s']);    
 end
+
 
