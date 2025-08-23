@@ -1,8 +1,10 @@
 function [TrackInterval,dt,B_scan_data,filename] = read_outdata()
 %UNTITLED 本函数的作用是读取out文件
 %   此处显示详细说明
+if nargin == 0
 [filename, pathname] = uigetfile('*.out', 'Select gprMax output file to plot B-scan', 'MultiSelect', 'on');
 fullfilename = fullfile(pathname, filename);
+end
 if fullfilename ~= 0
     header.iterations = double(h5readatt(fullfilename, '/', 'Iterations'));
     header.dt = h5readatt(fullfilename, '/', 'dt');
@@ -22,4 +24,5 @@ colormap('gray');
 colorbar;
 B_scan_data = field;
 TrackInterval = 0.02;
+
 end
