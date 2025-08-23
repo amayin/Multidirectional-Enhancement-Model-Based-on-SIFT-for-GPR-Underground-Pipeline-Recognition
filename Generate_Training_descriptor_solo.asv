@@ -6,8 +6,8 @@ close all;
 % 本程序需要时刻注意的地方：参数定义区域，读取文件类型区域，手动选取标签区域
 
 %% Define the constants used
-output_path = 'F:\硕士文件\gprMAX相关\实测数据\SIFT_extract\Multidirectional Enhancement Model Based on SIFT for GPR Underground Pipeline Recognition_latex\描述符\'; % 输出描述符路径
-PCA_path = 'D:\硕士文件\gprMAX相关\实测数据\SIFT_extract\SIFT_extract_in_GPR\descriptors\target_real\PCA_model.csv'; % 在构建PCA-SIFT描述符时，PCA模型路径
+output_path = '\input\your\path'; % 输出描述符路径
+PCA_path = '\input\your\path'; % 在构建PCA-SIFT描述符时，PCA模型路径
 begin = 1;% 文件开始读取点
 en = 1;% 文件结束读取点
 sigma=1.6;%最底层高斯金字塔的尺度
