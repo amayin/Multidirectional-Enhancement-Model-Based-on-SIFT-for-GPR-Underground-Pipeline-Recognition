@@ -3,42 +3,44 @@ function [dx, dt,Ydata,name] = main_gssi()
 clc;
 close all;
 %-------------
-%% ÊäÈë²ÎÊı
-[name, path]=uigetfile('D:/study/GPR_yi/sim/B_scan_imaging_interpreting/*.DZT','´ò¿ªÀ×´ïÌ½²âÊı¾İ');
+%% è¾“å…¥å‚æ•°
+if nargin == 0
+[name, path]=uigetfile('D:/study/GPR_yi/sim/B_scan_imaging_interpreting/*.DZT','æ‰“å¼€é›·è¾¾æ¢æµ‹æ•°æ®');
 file=strcat(path,name);
+end
 
 filename = file;
 Data = readgssi(filename);
-% ÌáÈ¡Êı¾İ¼°ÎÄÍ·
+% æå–æ•°æ®åŠæ–‡å¤´
 Ydata = Data.samp;  
 % Ydata(1034:end,:) = [];
-Ydata = Ydata./max(max(abs(Ydata))); %¹éÒ»»¯
-Tmax =  Data.head.range*1e-9; %×î´óÊ±¼ä£¬Data.head.range£ºÔÚP_1ÖĞÊÇÕû¸öÊ±¼äÆÊÃæµÄ´óĞ¡
+Ydata = Ydata./max(max(abs(Ydata))); %å½’ä¸€åŒ–
+Tmax =  Data.head.range*1e-9; %æœ€å¤§æ—¶é—´ï¼ŒData.head.rangeï¼šåœ¨P_1ä¸­æ˜¯æ•´ä¸ªæ—¶é—´å‰–é¢çš„å¤§å°
 % Tmax =  Data.head.range*1e-9+Data.head.position*1e-9;
 [ny, nx] = size(Ydata);
 dt = Tmax/ny; %
-t = (1-1:ny-1).*dt.*1e9; %Ê±¼ä
-Er = 1; %½éÖÊ½éµç³£Êı   
-D = t.*(0.3/sqrt(Er))./2; %Éî¶È
-x = (0:nx-1);  dx = 0.5; % ²½½ø£¬µ¥Î»[cm]
-X = x.*dx; % ¾àÀë£¬µ¥Î»[cm]
+t = (1-1:ny-1).*dt.*1e9; %æ—¶é—´
+Er = 1; %ä»‹è´¨ä»‹ç”µå¸¸æ•°   
+D = t.*(0.3/sqrt(Er))./2; %æ·±åº¦
+x = (0:nx-1);  dx = 0.5; % æ­¥è¿›ï¼Œå•ä½[cm]
+X = x.*dx; % è·ç¦»ï¼Œå•ä½[cm]
 
-gain_p = 0;  % ÊÇ·ñÔöÒæ£¬1£ºÔöÒæ£¬0£º²»ÔöÒæ
-gain_t=5.*1e-9; % Ö¸ÊıÔöÒæÊ±´°[ns]
-t_delay= 0.2504;  %ÁãÊ±Ğ£×¼[ns]
-t_max=3; %ÉèÖÃÏÔÊ¾µÄÊ±´°[ns]
+gain_p = 0;  % æ˜¯å¦å¢ç›Šï¼Œ1ï¼šå¢ç›Šï¼Œ0ï¼šä¸å¢ç›Š
+gain_t=5.*1e-9; % æŒ‡æ•°å¢ç›Šæ—¶çª—[ns]
+t_delay= 0.2504;  %é›¶æ—¶æ ¡å‡†[ns]
+t_max=3; %è®¾ç½®æ˜¾ç¤ºçš„æ—¶çª—[ns]
 D_max=t_max.*(0.3/sqrt(Er))./2;
 
-colorbar_amp=0.5; %ÏÔÊ¾ÑÕÉ«Í¼³ß¶È
-max_gain=1; %ÏÔÊ¾ÔöÒæÏµÊı£¬1±íÊ¾Ã»ÓĞÏÔÊ¾ÔöÒæ£¬Ô½´óÔÓ²¨Ô½Ç¿
+colorbar_amp=0.5; %æ˜¾ç¤ºé¢œè‰²å›¾å°ºåº¦
+max_gain=1; %æ˜¾ç¤ºå¢ç›Šç³»æ•°ï¼Œ1è¡¨ç¤ºæ²¡æœ‰æ˜¾ç¤ºå¢ç›Šï¼Œè¶Šå¤§æ‚æ³¢è¶Šå¼º
 
-ntrace = 16; %²é¿´Ä³µÀ²¨ĞÎ
-%% È¥±³¾°
-Ydata = Ydata-repmat(sum(Ydata,2)/nx,1,nx); % ¾ùÖµ¶ÔÏû
-% nn = 50; % »¬¶¯´°¿Ú
-% [Ydata, nn] = rmswbackgr(Ydata ,nn); % »¬¶¯È¥±³¾°
-%% ÁãÊ±Ğ£Õı
-index_cut_start=find(t>=t_delay,1,'first'); %ÆğÊ¼½ØÈ¡ÏÂ±ê
+ntrace = 16; %æŸ¥çœ‹æŸé“æ³¢å½¢
+%% å»èƒŒæ™¯
+Ydata = Ydata-repmat(sum(Ydata,2)/nx,1,nx); % å‡å€¼å¯¹æ¶ˆ
+% nn = 50; % æ»‘åŠ¨çª—å£
+% [Ydata, nn] = rmswbackgr(Ydata ,nn); % æ»‘åŠ¨å»èƒŒæ™¯
+%% é›¶æ—¶æ ¡æ­£
+index_cut_start=find(t>=t_delay,1,'first'); %èµ·å§‹æˆªå–ä¸‹æ ‡
 Ydata(1:index_cut_start,:)=0;
 Ydata=circshift(Ydata,[-1*index_cut_start,0]);
 %% Gain
@@ -109,5 +111,6 @@ set(gca,'Fontsize',18)
 % title('Trace25')
 % title(['trace:',num2str(ntrace)])
 % set(gcf,'unit','centimeters','position',[2 2 12 10])
-% legend('ÕıÏò','·´Ïò')% 
+% legend('æ­£å‘','åå‘')% 
 end
+
