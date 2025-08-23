@@ -1,14 +1,16 @@
-%¶ÁÈ¡LTDÀ×´ïÊµ²âÔ­Ê¼BÉ¨Í¼Ïñº¯Êı
-%ÊäÈë£º¸ñÊ½ÎªLTEµÄÎÄ¼şÂ·¾¶
-%Êä³ö£ºB-san Í¼ÏñÔ­Ê¼Êı¾İ µÀ¼ä¾à ²ÉÑù¼ä¸ô
+%è¯»å–LTDé›·è¾¾å®æµ‹åŸå§‹Bæ‰«å›¾åƒå‡½æ•°
+%è¾“å…¥ï¼šæ ¼å¼ä¸ºLTEçš„æ–‡ä»¶è·¯å¾„
+%è¾“å‡ºï¼šB-san å›¾åƒåŸå§‹æ•°æ® é“é—´è· é‡‡æ ·é—´éš”
 %% 
 function [TrackInterval,dt,Ydata,name] = readB_scan()
 % clear;
 clc ;
 close all;
 FileHead=1024;
-[name, path]=uigetfile('D:/study/GPR_yi/sim/B_scan_imaging_interpreting/*.lte','´ò¿ªÀ×´ïÌ½²âÊı¾İ');
+if nargin == 0
+[name, path]=uigetfile('D:/study/GPR_yi/sim/B_scan_imaging_interpreting/*.lte','æ‰“å¼€é›·è¾¾æ¢æµ‹æ•°æ®');
 fileName=strcat(path,name);
+end
 if exist('fileName')==0
     disp('File Not Exist');
 end  
@@ -17,37 +19,38 @@ fid =fopen(fileName);
 % fseek(fid,4,'bof');
 % fseek(fid,5,'bof');
 fseek(fid,0,'bof');
-tag=fread(fid,1,'int16');%¶Á³ö±êÖ¾Î»,2600Îª256,É¨ËÙ¡¢Ê±´°µÈÓÃÕûĞÎ£¬ÆäÓàÉè±¸ÓÃfloatĞÍ
+tag=fread(fid,1,'int16');%è¯»å‡ºæ ‡å¿—ä½,2600ä¸º256,æ‰«é€Ÿã€æ—¶çª—ç­‰ç”¨æ•´å½¢ï¼Œå…¶ä½™è®¾å¤‡ç”¨floatå‹
 fseek(fid,4,'bof');
-samPointNum=fread(fid,1,'int16');%¶Á³ö²ÉÑùµã
+samPointNum=fread(fid,1,'int16');%è¯»å‡ºé‡‡æ ·ç‚¹
 fseek(fid,0,'bof');
 p1=ftell(fid);
 fseek(fid,0,'eof');
 p2=ftell(fid);
-lenperL=(p2-p1-FileHead)/(samPointNum*2);%´ÓÍ·ÎÄ¼şÖĞ¶Á³ö×ÜµÄµÀÊı
+lenperL=(p2-p1-FileHead)/(samPointNum*2);%ä»å¤´æ–‡ä»¶ä¸­è¯»å‡ºæ€»çš„é“æ•°
 
 fseek(fid,18,'bof');
-PulseInterval = fread(fid,1,'float32');%¶Á³öÂö³å¼ä¸ô£¨µÚÒ»¸ö¼ä¸ô£©
+PulseInterval = fread(fid,1,'float32');%è¯»å‡ºè„‰å†²é—´éš”ï¼ˆç¬¬ä¸€ä¸ªé—´éš”ï¼‰
 
 fseek(fid,109,'bof');
-Interval2 = fread(fid,1,'short');%¶Á³öµÚ¶ş¸ö¼ä¸ô
+Interval2 = fread(fid,1,'short');%è¯»å‡ºç¬¬äºŒä¸ªé—´éš”
 
-TrackInterval = PulseInterval*Interval2*1e-2;%µÀ¼ä¾à
+TrackInterval = PulseInterval*Interval2*1e-2;%é“é—´è·
 if tag==256
     fseek(fid,26,'bof');
-    timeWindow=fread(fid,1,'int32');%´ÓÍ·ÎÄ¼şÖĞ¶Á³öÊ±´°
+    timeWindow=fread(fid,1,'int32');%ä»å¤´æ–‡ä»¶ä¸­è¯»å‡ºæ—¶çª—
     fseek(fid,10,'bof');
-    scanspeed=fread(fid,1,'int32');%´ÓÍ·ÎÄ¼şÖĞ¶Á³öÉ¨ËÙ
+    scanspeed=fread(fid,1,'int32');%ä»å¤´æ–‡ä»¶ä¸­è¯»å‡ºæ‰«é€Ÿ
 else
     fseek(fid,26,'bof');
-    timeWindow=fread(fid,1,'float32');%´ÓÍ·ÎÄ¼şÖĞ¶Á³öÊ±´°
+    timeWindow=fread(fid,1,'float32');%ä»å¤´æ–‡ä»¶ä¸­è¯»å‡ºæ—¶çª—
     fseek(fid,10,'bof');
-    scanspeed=fread(fid,1,'float32');%´ÓÍ·ÎÄ¼şÖĞ¶Á³öÉ¨ËÙ
+    scanspeed=fread(fid,1,'float32');%ä»å¤´æ–‡ä»¶ä¸­è¯»å‡ºæ‰«é€Ÿ
 end
-dt = timeWindow/samPointNum*1e-9;         %²ÉÑù¼ä¸ô
+dt = timeWindow/samPointNum*1e-9;         %é‡‡æ ·é—´éš”
 fseek(fid,30,'bof');
-freq=fread(fid,1,'int16');%´ÓÍ·ÎÄ¼şÖĞ¶Á³öÆµÂÊ
+freq=fread(fid,1,'int16');%ä»å¤´æ–‡ä»¶ä¸­è¯»å‡ºé¢‘ç‡
 fseek(fid,FileHead,'bof');
-Ydata=fread(fid,[samPointNum,lenperL],'int16');%¶Á³öÔ­Ê¼Êı¾İ
+Ydata=fread(fid,[samPointNum,lenperL],'int16');%è¯»å‡ºåŸå§‹æ•°æ®
 fclose(fid);
+
 end
