@@ -1,64 +1,64 @@
-% µ¥ÎÄ¼ş´¦ÀíËã·¨
+% å•æ–‡ä»¶å¤„ç†ç®—æ³•
 clear;
 clc;
 close all;
 
-% ±¾³ÌĞòĞèÒªÊ±¿Ì×¢ÒâµÄµØ·½£º²ÎÊı¶¨ÒåÇøÓò£¬¶ÁÈ¡ÎÄ¼şÀàĞÍÇøÓò£¬ÊÖ¶¯Ñ¡È¡±êÇ©ÇøÓò
+% æœ¬ç¨‹åºéœ€è¦æ—¶åˆ»æ³¨æ„çš„åœ°æ–¹ï¼šå‚æ•°å®šä¹‰åŒºåŸŸï¼Œè¯»å–æ–‡ä»¶ç±»å‹åŒºåŸŸï¼Œæ‰‹åŠ¨é€‰å–æ ‡ç­¾åŒºåŸŸ
 
 %% Define the constants used
-output_path = 'F:\Ë¶Ê¿ÎÄ¼ş\gprMAXÏà¹Ø\Êµ²âÊı¾İ\SIFT_extract\Multidirectional Enhancement Model Based on SIFT for GPR Underground Pipeline Recognition_latex\ÃèÊö·û\'; % Êä³öÃèÊö·ûÂ·¾¶
-PCA_path = 'D:\Ë¶Ê¿ÎÄ¼ş\gprMAXÏà¹Ø\Êµ²âÊı¾İ\SIFT_extract\SIFT_extract_in_GPR\descriptors\target_real\PCA_model.csv'; % ÔÚ¹¹½¨PCA-SIFTÃèÊö·ûÊ±£¬PCAÄ£ĞÍÂ·¾¶
-begin = 1;% ÎÄ¼ş¿ªÊ¼¶ÁÈ¡µã
-en = 1;% ÎÄ¼ş½áÊø¶ÁÈ¡µã
-sigma=1.6;%×îµ×²ã¸ßË¹½ğ×ÖËşµÄ³ß¶È
-dog_center_layer=5;%¶¨ÒåÁËDOG½ğ×ÖËşÃ¿×éÖĞ¼ä²ãÊı£¬Ä¬ÈÏÊÇ5
-contrast_threshold_1=0.03;%Contrast threshold Ô­°æ¸øµÄÊÇ0.03
+output_path = '\input\your\path'; % è¾“å‡ºæè¿°ç¬¦è·¯å¾„
+PCA_path = '\input\your\path'; % åœ¨æ„å»ºPCA-SIFTæè¿°ç¬¦æ—¶ï¼ŒPCAæ¨¡å‹è·¯å¾„
+begin = 1;% æ–‡ä»¶å¼€å§‹è¯»å–ç‚¹
+en = 1;% æ–‡ä»¶ç»“æŸè¯»å–ç‚¹
+sigma=1.6;%æœ€åº•å±‚é«˜æ–¯é‡‘å­—å¡”çš„å°ºåº¦
+dog_center_layer=5;%å®šä¹‰äº†DOGé‡‘å­—å¡”æ¯ç»„ä¸­é—´å±‚æ•°ï¼Œé»˜è®¤æ˜¯5
+contrast_threshold_1=0.03;%Contrast threshold åŸç‰ˆç»™çš„æ˜¯0.03
 edge_threshold=10;%Edge threshold
 is_double_size=false;%expand image or not
 des_type ='FE-GLOH-like';%Type of descriptor,it can be 'GLOH-like','SIFT','PCA-SIFT','RootSIFT','FE-GLOH-like'
 LOG_POLAR_DESCR_WIDTH=8;
 LOG_POLAR_HIST_BINS=8;
-SIFT_DESCR_WIDTH=4;   %SIFTÌØÕ÷ÌáÈ¡ÇøÓò£¬Ä¬ÈÏ4¡Á4ÇøÓò
-SIFT_HIST_BINS=8;     %SIFTÌØÕ÷·½Ïò£¬Ä¬ÈÏ8·½Ïò
-T_angle=3;    % ¾àÀë´¹Ö±¾àÀëµÄÆ«ÒÆ½Ç¶ÈãĞÖµ£¬abs()<T_angleÈÏ¶¨Îª´¹Ö±
-FS_vector=[1,1,1,1,1,1,1,1]; % Ã¿¸ö½Ç¶ÈµÄÌØÕ÷ÔöÇ¿ÏµÊı£¬×îºóÒ»¸öÖµÊÇ¹Ø¼üµãÖ÷·½ÏòÔöÇ¿ÏµÊı
-edge_detect = "on"; % ÊÇ·ñÈ¥³ı±ßÔµĞ§Ó¦£¬on±íÊ¾È¥³ı±ßÔµĞ§Ó¦
-angleverse = "on"; % ÊÇ·ñ±©Á¦·­×ªÖ÷·½Ïò½Ç¶È
-contrast = [10,0.05]; % µ±¹Ø¼üµãÊıÁ¿´óÓÚµÚÒ»¸öÊıÊ±£¬¿ªÆôÈ¥³ıµÍ·ù¶ÈµãÄ£Ê½£¬ãĞÖµÎªµÚ¶ş¸öÊı
+SIFT_DESCR_WIDTH=4;   %SIFTç‰¹å¾æå–åŒºåŸŸï¼Œé»˜è®¤4Ã—4åŒºåŸŸ
+SIFT_HIST_BINS=8;     %SIFTç‰¹å¾æ–¹å‘ï¼Œé»˜è®¤8æ–¹å‘
+T_angle=3;    % è·ç¦»å‚ç›´è·ç¦»çš„åç§»è§’åº¦é˜ˆå€¼ï¼Œabs()<T_angleè®¤å®šä¸ºå‚ç›´
+FS_vector=[1,1,1,1,1,1,1,1]; % æ¯ä¸ªè§’åº¦çš„ç‰¹å¾å¢å¼ºç³»æ•°ï¼Œæœ€åä¸€ä¸ªå€¼æ˜¯å…³é”®ç‚¹ä¸»æ–¹å‘å¢å¼ºç³»æ•°
+edge_detect = "on"; % æ˜¯å¦å»é™¤è¾¹ç¼˜æ•ˆåº”ï¼Œonè¡¨ç¤ºå»é™¤è¾¹ç¼˜æ•ˆåº”
+angleverse = "on"; % æ˜¯å¦æš´åŠ›ç¿»è½¬ä¸»æ–¹å‘è§’åº¦
+contrast = [10,0.05]; % å½“å…³é”®ç‚¹æ•°é‡å¤§äºç¬¬ä¸€ä¸ªæ•°æ—¶ï¼Œå¼€å¯å»é™¤ä½å¹…åº¦ç‚¹æ¨¡å¼ï¼Œé˜ˆå€¼ä¸ºç¬¬äºŒä¸ªæ•°
 T_symmetry = 1.2;
-n_max = 100; % Èç¹û¼ÓÈëÏàÎ»¶¶¶¯£¬×î´ó¶¶¶¯´óĞ¡
-n_sigma2 = 1; % ¸ßË¹¶¶¶¯´óĞ¡
-phase_noise = "off"; %ÊÇ·ñ¼ÓÏàÎ»¶¶¶¯£¬¡°on¡±¼ÓÔë£¬¡°off¡±²»¼ÓÔë
-interpola = "off"; %ÊÇ·ñ½øĞĞËõ·Å£¬"on"ÊÇ£¬"off"·ñ
-inter_m = [512,160]; %Ëõ·Å±¶Êı
-mode = "DZT"; % Ô´ÎÄ¼şÀàĞÍ£¬°üº¬"out","lte","DZT","png"£¬¿É×Ô¶¨ÒåÆäËûÀàĞÍ
+n_max = 100; % å¦‚æœåŠ å…¥ç›¸ä½æŠ–åŠ¨ï¼Œæœ€å¤§æŠ–åŠ¨å¤§å°
+n_sigma2 = 1; % é«˜æ–¯æŠ–åŠ¨å¤§å°
+phase_noise = "off"; %æ˜¯å¦åŠ ç›¸ä½æŠ–åŠ¨ï¼Œâ€œonâ€åŠ å™ªï¼Œâ€œoffâ€ä¸åŠ å™ª
+interpola = "off"; %æ˜¯å¦è¿›è¡Œç¼©æ”¾ï¼Œ"on"æ˜¯ï¼Œ"off"å¦
+inter_m = [512,160]; %ç¼©æ”¾å€æ•°
+mode = "DZT"; % æºæ–‡ä»¶ç±»å‹ï¼ŒåŒ…å«"out","lte","DZT","png"ï¼Œå¯è‡ªå®šä¹‰å…¶ä»–ç±»å‹
 
 for outid = begin:en
-    disp(['----------------¿ªÊ¼Éú³ÉµÚ',num2str(outid),'¸öÎÄ¼şµÄÃèÊö·û----------------']);
-    %% ¶ÁÈ¡ÎÄ¼ş
+    disp(['----------------å¼€å§‹ç”Ÿæˆç¬¬',num2str(outid),'ä¸ªæ–‡ä»¶çš„æè¿°ç¬¦----------------']);
+    %% è¯»å–æ–‡ä»¶
     if strcmp(mode,"out")
-    % out·ÂÕæÎÄ¼ş
+    % outä»¿çœŸæ–‡ä»¶
     [TrackInterval,dt,B_scan_image,outfile_name] = read_outdata();
     file_parts = split(DZTfile_name,'.');
     file_label = file_parts{1};
 
     elseif strcmp(mode,"lte")
-    % ¶ÁÈ¡lteÎÄ¼ş
+    % è¯»å–lteæ–‡ä»¶
     [TrackInterval,dt,B_scan_image,ltefile_name] = readB_scan();
     file_parts = split(ltefile_name,'.');
     file_label = file_parts{1};
 
     elseif strcmp(mode,"DZT")
-    % ¶ÁÈ¡GSSI¹«Ë¾µÄDZTÎÄ¼ş
+    % è¯»å–GSSIå…¬å¸çš„DZTæ–‡ä»¶
     [TrackInterval,dt,B_scan_image,DZTfile_name] = main_gssi();
-    TrackInterval = TrackInterval*0.01;% ÓÉÓÚ·µ»ØµÄÊÇcm£¬Òò´Ë³Ë0.01
+    TrackInterval = TrackInterval*0.01;% ç”±äºè¿”å›çš„æ˜¯cmï¼Œå› æ­¤ä¹˜0.01
     time = (0:size(B_scan_image,1)-1)*dt;
     track = (1:size(B_scan_image,2))*TrackInterval; 
     file_parts = split(DZTfile_name,'.');
     file_label = file_parts{1};
     
     elseif strcmp(mode,"png")
-    % ¶ÁÈ¡pngÎÄ¼ş
+    % è¯»å–pngæ–‡ä»¶
     [png_name, png_path] = uigetfile('*.png', 'Select gprMax image to analyse', 'MultiSelect', 'on');
     file_parts = split(png_name,'.');
     file_label = file_parts{1};
@@ -67,7 +67,7 @@ for outid = begin:en
     B_scan_image = im2double(B_scan_png(:,:,1));
     end
 
-    % »­Í¼
+    % ç”»å›¾
     figure
     imagesc(B_scan_image);
     colormap('gray');
@@ -75,37 +75,37 @@ for outid = begin:en
     set(gca,'linewidth',1,'fontsize',20,'fontname','Times New Roman');
     origin_B_scan_image = B_scan_image;
 
-    %% Ô¤´¦Àí
-    % µÍÖÈÏ¡Êè·Ö½âÈ¥Ö±´ï²¨
-    addpath('D:\Ë¶Ê¿ÎÄ¼ş\gprMAXÏà¹Ø\Êµ²âÊı¾İ\RPCA_With_TV');
-    addpath('D:\Ë¶Ê¿ÎÄ¼ş\gprMAXÏà¹Ø\Êµ²âÊı¾İ\RPCA_With_TV\read_data');  
-    addpath('D:\Ë¶Ê¿ÎÄ¼ş\gprMAXÏà¹Ø\Êµ²âÊı¾İ\RPCA_With_TV\prox_operator');  
-    addpath('D:\Ë¶Ê¿ÎÄ¼ş\gprMAXÏà¹Ø\Êµ²âÊı¾İ\RPCA_With_TV\calutate');
-    addpath('D:\Ë¶Ê¿ÎÄ¼ş\gprMAXÏà¹Ø\Êµ²âÊı¾İ\RPCA_With_TV\utils');
+    %% é¢„å¤„ç†
+    % ä½ç§©ç¨€ç–åˆ†è§£å»ç›´è¾¾æ³¢
+    addpath('D:\ç¡•å£«æ–‡ä»¶\gprMAXç›¸å…³\å®æµ‹æ•°æ®\RPCA_With_TV');
+    addpath('D:\ç¡•å£«æ–‡ä»¶\gprMAXç›¸å…³\å®æµ‹æ•°æ®\RPCA_With_TV\read_data');  
+    addpath('D:\ç¡•å£«æ–‡ä»¶\gprMAXç›¸å…³\å®æµ‹æ•°æ®\RPCA_With_TV\prox_operator');  
+    addpath('D:\ç¡•å£«æ–‡ä»¶\gprMAXç›¸å…³\å®æµ‹æ•°æ®\RPCA_With_TV\calutate');
+    addpath('D:\ç¡•å£«æ–‡ä»¶\gprMAXç›¸å…³\å®æµ‹æ•°æ®\RPCA_With_TV\utils');
 %     lambda = 0.01;beta = 0.03;
 %     n_iters_ADMM=500;n_iters_TV=100;
 %     [X,runtime] = LRS_TV_InALM(B_scan_image,lambda,beta,n_iters_ADMM,n_iters_TV);
 %     B_scan_image_sparse = X.S;
-%     % ¾ùÖµ¶ÔÏû
+%     % å‡å€¼å¯¹æ¶ˆ
 %     for i = 1:size(B_scan_image,1)
 %         B_scan_image(i,:) = B_scan_image(i,:)-mean(B_scan_image(i,:));
 %     end
-%     % »­Í¼
+%     % ç”»å›¾
 %     figure
 %     imagesc(B_scan_image);
 %     colormap('gray');
 %     xlabel('Trace(m)');ylabel('Time(ns)');
 %     set(gca,'linewidth',1,'fontsize',20,'fontname','Times New Roman');
 
-    % Ëõ·Å
+    % ç¼©æ”¾
     if interpola == "on"
         B_scan_image = imresize(B_scan_image,inter_m);
     end
 
-    % ¹éÒ»»¯
+    % å½’ä¸€åŒ–
     B_scan_image_normalize = (B_scan_image-min(min(B_scan_image)))/(max(max(B_scan_image))-min(min(B_scan_image)));
     
-    % Ìí¼ÓÏàÎ»¶¶¶¯
+    % æ·»åŠ ç›¸ä½æŠ–åŠ¨
     if phase_noise == "on"
         [m,n]=size(B_scan_image_normalize);
         A_scan_length = m-n_max;
@@ -121,7 +121,7 @@ for outid = begin:en
         end
         B_scan_image_normalize = temp_B_scan_image;
     end
-    %% Éú³ÉÌØÕ÷ÃèÊöÏòÁ¿
+    %% ç”Ÿæˆç‰¹å¾æè¿°å‘é‡
     t1=clock;%Start time
 
     %% The number of groups in Gauss Pyramid
@@ -134,12 +134,12 @@ for outid = begin:en
     tic;
     [gaussian_pyramid_1,gaussian_gradient_1,gaussian_angle_1]=...
     build_gaussian_pyramid(B_scan_image_normalize,nOctaves_1,dog_center_layer,sigma);                                                      
-    disp(['²Î¿¼Í¼Ïñ´´½¨Gauss Pyramid»¨·ÑÊ±¼äÊÇ£º',num2str(toc),'s']);
+    disp(['å‚è€ƒå›¾åƒåˆ›å»ºGauss PyramidèŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(toc),'s']);
 
     %% DOG Pyramid of Reference image
     tic;
     dog_pyramid_1=build_dog_pyramid(gaussian_pyramid_1,nOctaves_1,dog_center_layer);
-    disp(['²Î¿¼Í¼Ïñ´´½¨DOG Pyramid»¨·ÑÊ±¼äÊÇ£º',num2str(toc),'s']);
+    disp(['å‚è€ƒå›¾åƒåˆ›å»ºDOG PyramidèŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(toc),'s']);
 
     %% display the Gauss Pyramid,DOG Pyramid,gradient of Reference image
 %     display_product_image(gaussian_pyramid_1,dog_pyramid_1,gaussian_gradient_1,...
@@ -151,10 +151,10 @@ for outid = begin:en
     [key_point_array_1]=find_scale_space_extream...
     (dog_pyramid_1,nOctaves_1,dog_center_layer,contrast_threshold_1,sigma,...
     edge_threshold,gaussian_gradient_1,gaussian_angle_1,edge_detect);
-    disp(['²Î¿¼Í¼Ïñ¹Ø¼üµã¶¨Î»»¨·ÑÊ±¼äÊÇ£º',num2str(toc),'s']);
+    disp(['å‚è€ƒå›¾åƒå…³é”®ç‚¹å®šä½èŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(toc),'s']);
 %     clear dog_pyramid_1;
     
-    %% Ñ¡È¡ÏòÉÏ/ÏòÏÂÌİ¶È¹Ø¼üµã
+    %% é€‰å–å‘ä¸Š/å‘ä¸‹æ¢¯åº¦å…³é”®ç‚¹
     Vernum = 0;
     temp_key_point_array = struct('x',{},'y',{},'octaves',{},'layer',{},...
      'xi',{},'size',{},'angle',{},'gradient',{});
@@ -171,7 +171,7 @@ for outid = begin:en
         end
     end
     key_point_array_1 = temp_key_point_array;
-    %% É¸Ñ¡Ğ¡·ù¶ÈÊı¾İ
+    %% ç­›é€‰å°å¹…åº¦æ•°æ®
     if size(key_point_array_1,2)>contrast(1,1)
     Vernum = 0;
     temp_key_point_array = struct('x',{},'y',{},'octaves',{},'layer',{},...
@@ -196,11 +196,11 @@ for outid = begin:en
                                     key_point_array_1,nOctaves_1,is_double_size,des_type,...
                                     LOG_POLAR_DESCR_WIDTH,LOG_POLAR_HIST_BINS,...
                                     SIFT_DESCR_WIDTH,SIFT_HIST_BINS,FS_vector);
-    disp(['²Î¿¼Í¼ÏñÃèÊö·ûÉú³É»¨·ÑÊ±¼äÊÇ£º',num2str(toc),'s']); 
+    disp(['å‚è€ƒå›¾åƒæè¿°ç¬¦ç”ŸæˆèŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(toc),'s']); 
 %     clear gaussian_gradient_1;
 %     clear gaussian_angle_1;
     
-    %% ¸ù¾İ¶Ô³ÆĞÔÉ¸Ñ¡Ë«ÇúÏß
+    %% æ ¹æ®å¯¹ç§°æ€§ç­›é€‰åŒæ›²çº¿
     [now_flag,now_locs_1,now_smy] = screen_point_by_symmery(descriptors_1,locs_1,LOG_POLAR_HIST_BINS,SIFT_HIST_BINS,T_symmetry,des_type);
     [nex_flag,nex_locs_1,nex_smy] = screen_point_by_symmery(nex_descriptors_1,locs_1,LOG_POLAR_HIST_BINS,SIFT_HIST_BINS,T_symmetry,des_type);
 
@@ -217,7 +217,7 @@ for outid = begin:en
     str4=['.\save_image\','Reference image detection point','.jpg'];
     saveas(button1,str4,'jpg');
     [button2]=disp_points_distribute(locs_1,nOctaves_1,dog_center_layer);
-    %% Õë¶ÔÄãµÄÊµ²âÊı¾İµÄÊÖ¶¯Ñ¡È¡±êÇ©£¬±¾²¿·Ö²»Ó°Ïì×îÖÕÊ¶±ğ½á¹û
+    %% é’ˆå¯¹ä½ çš„å®æµ‹æ•°æ®çš„æ‰‹åŠ¨é€‰å–æ ‡ç­¾ï¼Œæœ¬éƒ¨åˆ†ä¸å½±å“æœ€ç»ˆè¯†åˆ«ç»“æœ
     label = zeros(size(locs_1,1),1);
     for i = 1:size(descriptors_1,1)
         if locs_1(i,1)>=300
@@ -225,85 +225,86 @@ for outid = begin:en
         end
     end
     %% Save the data with csv
-    % ±£´æ¶Ô³ÆĞÔÅĞ±ğflag
-    % ÉèÖÃÄãÏëÒª´´½¨µÄÎÄ¼ş¼ĞÃû³Æ
+    % ä¿å­˜å¯¹ç§°æ€§åˆ¤åˆ«flag
+    % è®¾ç½®ä½ æƒ³è¦åˆ›å»ºçš„æ–‡ä»¶å¤¹åç§°
     flagfolderName = strcat(output_path,file_label,'\flag_',des_type);
-    % ¼ì²éÎÄ¼ş¼ĞÊÇ·ñÒÑ¾­´æÔÚ
+    % æ£€æŸ¥æ–‡ä»¶å¤¹æ˜¯å¦å·²ç»å­˜åœ¨
     if ~exist(flagfolderName, 'dir')
-        % ÎÄ¼ş¼Ğ²»´æÔÚ£¬´´½¨ÎÄ¼ş¼Ğ
+        % æ–‡ä»¶å¤¹ä¸å­˜åœ¨ï¼Œåˆ›å»ºæ–‡ä»¶å¤¹
         mkdir(flagfolderName);
-        disp(['ÎÄ¼ş¼Ğ "' flagfolderName '" ÒÑ´´½¨.']);
+        disp(['æ–‡ä»¶å¤¹ "' flagfolderName '" å·²åˆ›å»º.']);
     else
-        % ÎÄ¼ş¼ĞÒÑ´æÔÚ
-        disp(['ÎÄ¼ş¼Ğ "' flagfolderName '" ÒÑ´æÔÚ.']);
+        % æ–‡ä»¶å¤¹å·²å­˜åœ¨
+        disp(['æ–‡ä»¶å¤¹ "' flagfolderName '" å·²å­˜åœ¨.']);
     end
-    labtit=strcat(flagfolderName,'\now_flag_',num2str(outid),'.csv');% Ë³ĞòÃû³Æ
+    labtit=strcat(flagfolderName,'\now_flag_',num2str(outid),'.csv');% é¡ºåºåç§°
     [time] = save_csv(now_flag,labtit);
-    disp(['±£´æ±êÇ©»¨·ÑÊ±¼äÊÇ£º',num2str(time),'s']);
-    labtit=strcat(flagfolderName,'\nex_flag_',num2str(outid),'.csv');% Ë³ĞòÃû³Æ
+    disp(['ä¿å­˜æ ‡ç­¾èŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(time),'s']);
+    labtit=strcat(flagfolderName,'\nex_flag_',num2str(outid),'.csv');% é¡ºåºåç§°
     [time] = save_csv(nex_flag,labtit);
-    disp(['±£´æ±êÇ©»¨·ÑÊ±¼äÊÇ£º',num2str(time),'s']);
+    disp(['ä¿å­˜æ ‡ç­¾èŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(time),'s']);
     
-    % ±£´ælabel
+    % ä¿å­˜label
     labelfolderName = strcat(output_path,file_label,'\label_',des_type);
-    % ¼ì²éÎÄ¼ş¼ĞÊÇ·ñÒÑ¾­´æÔÚ
+    % æ£€æŸ¥æ–‡ä»¶å¤¹æ˜¯å¦å·²ç»å­˜åœ¨
     if ~exist(labelfolderName, 'dir')
-        % ÎÄ¼ş¼Ğ²»´æÔÚ£¬´´½¨ÎÄ¼ş¼Ğ
+        % æ–‡ä»¶å¤¹ä¸å­˜åœ¨ï¼Œåˆ›å»ºæ–‡ä»¶å¤¹
         mkdir(labelfolderName);
-        disp(['ÎÄ¼ş¼Ğ "' labelfolderName '" ÒÑ´´½¨.']);
+        disp(['æ–‡ä»¶å¤¹ "' labelfolderName '" å·²åˆ›å»º.']);
     else
-        % ÎÄ¼ş¼ĞÒÑ´æÔÚ
-        disp(['ÎÄ¼ş¼Ğ "' labelfolderName '" ÒÑ´æÔÚ.']);
+        % æ–‡ä»¶å¤¹å·²å­˜åœ¨
+        disp(['æ–‡ä»¶å¤¹ "' labelfolderName '" å·²å­˜åœ¨.']);
     end
-    labtit=strcat(labelfolderName,'\label_',num2str(outid),'.csv');% Ë³ĞòÃû³Æ
+    labtit=strcat(labelfolderName,'\label_',num2str(outid),'.csv');% é¡ºåºåç§°
     [time] = save_csv(label,labtit);
-    disp(['±£´æ±êÇ©»¨·ÑÊ±¼äÊÇ£º',num2str(time),'s']);
+    disp(['ä¿å­˜æ ‡ç­¾èŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(time),'s']);
     
-    % ±£´ædescriptor
+    % ä¿å­˜descriptor
     datafolderName = strcat(output_path,file_label,'\data_',des_type);
-    % ¼ì²éÎÄ¼ş¼ĞÊÇ·ñÒÑ¾­´æÔÚ
+    % æ£€æŸ¥æ–‡ä»¶å¤¹æ˜¯å¦å·²ç»å­˜åœ¨
     if ~exist(datafolderName, 'dir')
-        % ÎÄ¼ş¼Ğ²»´æÔÚ£¬´´½¨ÎÄ¼ş¼Ğ
+        % æ–‡ä»¶å¤¹ä¸å­˜åœ¨ï¼Œåˆ›å»ºæ–‡ä»¶å¤¹
         mkdir(datafolderName);
-        disp(['ÎÄ¼ş¼Ğ "' datafolderName '" ÒÑ´´½¨.']);
+        disp(['æ–‡ä»¶å¤¹ "' datafolderName '" å·²åˆ›å»º.']);
     else
-        % ÎÄ¼ş¼ĞÒÑ´æÔÚ
-        disp(['ÎÄ¼ş¼Ğ "' datafolderName '" ÒÑ´æÔÚ.']);
+        % æ–‡ä»¶å¤¹å·²å­˜åœ¨
+        disp(['æ–‡ä»¶å¤¹ "' datafolderName '" å·²å­˜åœ¨.']);
     end
-    destit=strcat(datafolderName,'\now_descriptor_',num2str(outid),'.csv');% Ë³ĞòÃû³Æ
+    destit=strcat(datafolderName,'\now_descriptor_',num2str(outid),'.csv');% é¡ºåºåç§°
     [time] = save_csv(descriptors_1,destit);
-    disp(['±£´æÌØÕ÷ÃèÊö·û»¨·ÑÊ±¼äÊÇ£º',num2str(time),'s']);
-    desnextit=strcat(datafolderName,'\nex_descriptor_',num2str(outid),'.csv');% Ë³ĞòÃû³Æ
+    disp(['ä¿å­˜ç‰¹å¾æè¿°ç¬¦èŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(time),'s']);
+    desnextit=strcat(datafolderName,'\nex_descriptor_',num2str(outid),'.csv');% é¡ºåºåç§°
     [time] = save_csv(nex_descriptors_1,desnextit);
-    disp(['±£´æÌØÕ÷ÃèÊö·û»¨·ÑÊ±¼äÊÇ£º',num2str(time),'s']);
+    disp(['ä¿å­˜ç‰¹å¾æè¿°ç¬¦èŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(time),'s']);
     
-    % ±£´æloc
+    % ä¿å­˜loc
     locfolderName = strcat(output_path,file_label,'\loc_',des_type);
-    % ¼ì²éÎÄ¼ş¼ĞÊÇ·ñÒÑ¾­´æÔÚ
+    % æ£€æŸ¥æ–‡ä»¶å¤¹æ˜¯å¦å·²ç»å­˜åœ¨
     if ~exist(locfolderName, 'dir')
-        % ÎÄ¼ş¼Ğ²»´æÔÚ£¬´´½¨ÎÄ¼ş¼Ğ
+        % æ–‡ä»¶å¤¹ä¸å­˜åœ¨ï¼Œåˆ›å»ºæ–‡ä»¶å¤¹
         mkdir(locfolderName);
-        disp(['ÎÄ¼ş¼Ğ "' locfolderName '" ÒÑ´´½¨.']);
+        disp(['æ–‡ä»¶å¤¹ "' locfolderName '" å·²åˆ›å»º.']);
     else
-        % ÎÄ¼ş¼ĞÒÑ´æÔÚ
-        disp(['ÎÄ¼ş¼Ğ "' locfolderName '" ÒÑ´æÔÚ.']);
+        % æ–‡ä»¶å¤¹å·²å­˜åœ¨
+        disp(['æ–‡ä»¶å¤¹ "' locfolderName '" å·²å­˜åœ¨.']);
     end
-    loctit=strcat(locfolderName,'\loc_',num2str(outid),'.csv');% Ë³ĞòÃû³Æ
+    loctit=strcat(locfolderName,'\loc_',num2str(outid),'.csv');% é¡ºåºåç§°
     [time] = save_csv(locs_1,loctit);
-    disp(['±£´æÌØÕ÷ÃèÊö·û»¨·ÑÊ±¼äÊÇ£º',num2str(time),'s']);
+    disp(['ä¿å­˜ç‰¹å¾æè¿°ç¬¦èŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(time),'s']);
 
-    % ±£´ækeypoint
+    % ä¿å­˜keypoint
     keypointfolderName = strcat(output_path,file_label,'\keypoint_',des_type);
-    % ¼ì²éÎÄ¼ş¼ĞÊÇ·ñÒÑ¾­´æÔÚ
+    % æ£€æŸ¥æ–‡ä»¶å¤¹æ˜¯å¦å·²ç»å­˜åœ¨
     if ~exist(keypointfolderName, 'dir')
-        % ÎÄ¼ş¼Ğ²»´æÔÚ£¬´´½¨ÎÄ¼ş¼Ğ
+        % æ–‡ä»¶å¤¹ä¸å­˜åœ¨ï¼Œåˆ›å»ºæ–‡ä»¶å¤¹
         mkdir(keypointfolderName);
-        disp(['ÎÄ¼ş¼Ğ "' keypointfolderName '" ÒÑ´´½¨.']);
+        disp(['æ–‡ä»¶å¤¹ "' keypointfolderName '" å·²åˆ›å»º.']);
     else
-        % ÎÄ¼ş¼ĞÒÑ´æÔÚ
-        disp(['ÎÄ¼ş¼Ğ "' keypointfolderName '" ÒÑ´æÔÚ.']);
+        % æ–‡ä»¶å¤¹å·²å­˜åœ¨
+        disp(['æ–‡ä»¶å¤¹ "' keypointfolderName '" å·²å­˜åœ¨.']);
     end
-    keypointtit=strcat(keypointfolderName,'\keypoint_',num2str(outid),'.mat'); % Ë³ĞòÃû³Æ
+    keypointtit=strcat(keypointfolderName,'\keypoint_',num2str(outid),'.mat'); % é¡ºåºåç§°
     save(keypointtit,'key_point_array_1');
-    disp(['±£´æÌØÕ÷ÃèÊö·û»¨·ÑÊ±¼äÊÇ£º',num2str(time),'s']);
+    disp(['ä¿å­˜ç‰¹å¾æè¿°ç¬¦èŠ±è´¹æ—¶é—´æ˜¯ï¼š',num2str(time),'s']);
 end
+
