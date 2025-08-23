@@ -31,7 +31,7 @@ LOG_POLAR_HIST_BINS=8;
 SIFT_DESCR_WIDTH=4;   %SIFT特征提取区域，默认4×4区域
 SIFT_HIST_BINS=8;     %SIFT特征方向，默认8方向
 T_angle=3;    % 距离垂直距离的偏移角度阈值，abs()<T_angle认定为垂直
-FS_vector=[2,1,2,1,2,1,2,1]; % 每个角度的特征增强系数，最后一个值是关键点主方向增强系数
+FE_vector=[2,1,2,1,2,1,2,1]; % 每个角度的特征增强系数，最后一个值是关键点主方向增强系数
 Min_dim = 128; % PCA-SIFT才用到，降维后的维度
 edge_detect = "on"; % 是否去除边缘效应，on表示去除边缘效应
 angleverse = "on"; % 是否暴力翻转主方向角度
@@ -194,7 +194,7 @@ end
     [descriptors_1,nex_descriptors_1,locs_1]=calc_descriptors(gaussian_gradient_1,gaussian_angle_1,...
                                     key_point_array_1,nOctaves_1,is_double_size,is_sift_or_log,...
                                     LOG_POLAR_DESCR_WIDTH,LOG_POLAR_HIST_BINS,...
-                                    SIFT_DESCR_WIDTH,SIFT_HIST_BINS,FS_vector,PCA_path);
+                                    SIFT_DESCR_WIDTH,SIFT_HIST_BINS,FE_vector);
     disp(['参考图像描述符生成花费时间是：',num2str(toc),'s']); 
 %     clear gaussian_gradient_1;
 %     clear gaussian_angle_1;
@@ -368,5 +368,6 @@ end
     save(keypointtit,'key_point_array_1');
     disp(['保存特征描述符花费时间是：',num2str(time),'s']);    
 end
+
 
 
